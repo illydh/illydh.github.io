@@ -9,6 +9,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  background-color: #FAF9F6;
 }
 
 html {
@@ -167,6 +168,10 @@ section {
   justify-content: center;
   gap: 5rem;
   height: 80vh;
+}
+
+.profile-pic {
+  border-radius: 50%;
 }
 
 .section__pic-container {
