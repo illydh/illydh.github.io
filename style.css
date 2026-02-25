@@ -9,7 +9,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #FAF9F6;
+  background-color: #faf9f6;
 }
 
 html {
@@ -435,4 +435,119 @@ footer {
 
 footer p {
   text-align: center;
+}
+
+/* DARK MODE */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+body.dark-mode p,
+body.dark-mode .experience-sub-title,
+body.dark-mode .section__text__p1,
+body.dark-mode .section__text__p2 {
+  color: #cccccc;
+}
+body.dark-mode a,
+body.dark-mode .menu-links a,
+body.dark-mode .project-title,
+body.dark-mode .project-btn,
+body.dark-mode .logo,
+body.dark-mode .btn {
+  color: #f0f0f0;
+}
+body.dark-mode a:hover {
+  color: #aaaaaa;
+  text-decoration-color: #777777;
+}
+body.dark-mode .hamburger-icon span {
+  background-color: #f0f0f0;
+}
+body.dark-mode .menu-links {
+  background-color: #2a2a2a;
+}
+body.dark-mode .details-container {
+  background: #2a2a2a;
+  border-color: #444444;
+}
+body.dark-mode .color-container,
+body.dark-mode .contact-info-upper-container {
+  background: #333333;
+  border-color: #444444;
+}
+body.dark-mode .btn-color-1,
+body.dark-mode .btn-color-2 {
+  border-color: #f0f0f0;
+}
+body.dark-mode .btn-color-1,
+body.dark-mode .btn-color-2:hover {
+  background: #f0f0f0;
+  color: #1a1a1a;
+}
+body.dark-mode .btn-color-1:hover {
+  background: #bbbbbb;
+}
+body.dark-mode [src*="linkedin.png"],
+body.dark-mode [src*="github.png"],
+body.dark-mode [src*="experience.png"],
+body.dark-mode [src*="education.png"],
+body.dark-mode [src*="arrow.png"],
+body.dark-mode [src*="email.png"] {
+  filter: invert(1);
+}
+
+/* THEME SLIDER TOGGLE */
+.theme-switch-wrapper {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 999;
+}
+@media screen and (max-width: 1200px) {
+  .theme-switch-wrapper {
+    right: 8rem;
+    top: 6.5vh;
+  }
+}
+
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+.theme-switch input {
+  display: none;
+}
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: 0.4s;
+}
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: 0.4s;
+  width: 26px;
+}
+input:checked + .slider {
+  background-color: #555;
+}
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
 }
