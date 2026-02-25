@@ -74,8 +74,10 @@ a:hover {
 }
 
 .hamburger-menu {
-  position: relative;
-  display: inline-block;
+  position: fixed;
+  top: 2.3rem;
+  right: 2rem;
+  z-index: 999;
 }
 
 .hamburger-icon {
@@ -505,8 +507,8 @@ body.dark-mode [src*="email.png"] {
 }
 @media screen and (max-width: 1200px) {
   .theme-switch-wrapper {
-    right: 8rem;
-    top: 6.5vh;
+    right: 6rem;
+    top: 2rem;
   }
 }
 
