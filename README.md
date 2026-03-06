@@ -34,6 +34,7 @@ I am a first-year Master's in Computer Science student at the University of Sout
 
 Here are some of the exciting projects I've worked on recently (also featured on my portfolio):
 
+- **[Tiến Lên AI - Traditional VN Card Game Bot](https://github.com/illydh/tien-len-ai)**
 - **Predicting Motion of Masked Player with Transformers**
 - **Analyzing Autistic Behavioral Persistence with Transformers**
 - **FashionForward** - An Intelligent Fashion Classifier
