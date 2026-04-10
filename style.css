@@ -218,6 +218,11 @@ section {
 .icon {
   cursor: pointer;
   height: 2rem;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: translateY(-5px) scale(1.1);
 }
 
 /* BUTTONS */
@@ -234,6 +239,10 @@ section {
   padding: 1rem;
   width: 8rem;
   border-radius: 2rem;
+}
+
+.btn:hover {
+  transform: scale(1.05);
 }
 
 .btn-color-1,
@@ -308,6 +317,12 @@ section {
   border: rgb(53, 53, 53) 0.1rem solid;
   border-color: rgb(163, 163, 163);
   text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.details-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .section-container {
@@ -552,4 +567,20 @@ input:checked + .slider:before {
 }
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* Page load animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
 }
