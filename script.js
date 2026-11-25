@@ -167,8 +167,13 @@ const panel = document.querySelector("dialog.panel");
 const panelMeta = panel?.querySelector('[data-slot="meta"]');
 const panelBody = panel?.querySelector('[data-slot="body"]');
 const sheet = panel?.querySelector(".sheet");
+const closeButton = panel?.querySelector("[data-close]");
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 let opener = null;
 let closing = false;
+
+// Visible, focusable controls inside the panel, in tab order.
+const panelControls = () => [...panel.querySelectorAll(FOCUSABLE)].filter((el) => el.getClientRects().length);
 
 function openProject(slug, from) {
   const tpl = document.getElementById(`project-${slug}`);
@@ -179,6 +184,9 @@ function openProject(slug, from) {
   sheet.scrollTop = 0;
   rows.forEach((r) => r.classList.toggle("is-active", r === opener));
   if (!panel.open) panel.showModal();
+  // Browsers differ on where showModal() puts focus, and swapping the body
+  // while open drops it, so always start on Close.
+  closeButton.focus({ preventScroll: true });
   // Next frame, so the sheet transitions in from off screen.
   requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add("is-open")));
   history.replaceState(null, "", `#project-${slug}`);
@@ -202,9 +210,14 @@ function closeProject() {
     const finish = () => {
       if (finished) return;
       finished = true;
+      sheet.removeEventListener("transitionend", onEnd);
       done();
     };
-    sheet.addEventListener("transitionend", finish, { once: true });
+    // Only the sheet's own slide counts; transitions inside it bubble up too.
+    const onEnd = (e) => {
+      if (e.target === sheet) finish();
+    };
+    sheet.addEventListener("transitionend", onEnd);
     setTimeout(finish, 420);
   }
 }
@@ -217,6 +230,25 @@ if (panel) {
   });
   panel.addEventListener("click", (e) => {
     if (e.target === panel || e.target.closest("[data-close]")) closeProject();
+  });
+
+  // Keep Tab inside the open panel: wrap from the last control to the first
+  // and back, instead of stepping out to the browser's own toolbar.
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab" || !panel.open) return;
+    const items = panelControls();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    const inside = panel.contains(active);
+    if (e.shiftKey && (active === first || !inside)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || !inside)) {
+      e.preventDefault();
+      first.focus();
+    }
   });
 
   // Deep links: #project-<slug> opens that project.
