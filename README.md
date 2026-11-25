@@ -12,7 +12,8 @@ I am a first-year Master's in Computer Science student at the University of Sout
 
 **Current Roles:**
 
-- M.S. in Computer Science @ USC
+- Data Platform SWE Intern @ The Aerospace Corporation
+- Master's student studying Computer Science @ USC
 - Graduate Research Assistant @ FORTIS Lab
 - Computer Vision Lead @ USC ARC
 
