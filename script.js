@@ -60,27 +60,6 @@ const onScroll = () => header.toggleAttribute("data-scrolled", scrollY > 8);
 addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 
-// Mark the nav link for the section in view.
-const navLinks = new Map(
-  [...header.querySelectorAll(".nav-links a")].map((a) => [a.getAttribute("href").slice(1), a])
-);
-const sectionObserver = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      navLinks.forEach((a, id) => {
-        if (id === entry.target.id) a.setAttribute("aria-current", "location");
-        else a.removeAttribute("aria-current");
-      });
-    }
-  },
-  { rootMargin: "-45% 0px -50% 0px" }
-);
-navLinks.forEach((_, id) => {
-  const el = document.getElementById(id);
-  if (el) sectionObserver.observe(el);
-});
-
 /* Hero pipeline ---------------------------------------------------------- */
 
 const pipelineCanvas = document.querySelector(".pipeline canvas");
@@ -201,7 +180,8 @@ function closeProject() {
     closing = false;
     panel.close();
     rows.forEach((r) => r.classList.remove("is-active"));
-    history.replaceState(null, "", "#projects");
+    // Drop the #project-<slug> hash but stay on this page.
+    history.replaceState(null, "", location.pathname + location.search);
     opener?.focus({ preventScroll: true });
   };
   if (reduceMotion.matches) done();

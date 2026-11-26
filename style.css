@@ -102,12 +102,19 @@ html:has(dialog[open]) {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
   font: 400 1.0625rem/1.55 var(--font-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+main {
+  flex: 1;
 }
 
 img,
@@ -188,7 +195,7 @@ ol {
   color: var(--muted);
 }
 
-h2 {
+h1 {
   font: 400 clamp(2.5rem, 4.4vw, 4rem) / 1 var(--font-display);
   letter-spacing: -0.02em;
 }
@@ -582,6 +589,13 @@ h2 {
   color: var(--lit);
 }
 
+/* The role links to Experience; the padding gives it a 44px tap height
+   without making the line taller. */
+.status .text-link {
+  padding-block: 14px;
+  margin-block: -14px;
+}
+
 .run-dot {
   position: relative;
   flex: none;
@@ -680,15 +694,6 @@ h2 {
 
 .section {
   padding-block: var(--section-space);
-}
-
-.section + .section {
-  padding-top: 0;
-}
-
-.section + .section > .wrap {
-  padding-top: var(--section-space);
-  border-top: 1px solid var(--line);
 }
 
 .split {
@@ -1410,6 +1415,40 @@ details[open] .run-toggle::after {
   color: var(--ink);
 }
 
+/* Slim footer on every page but Contact */
+.site-footer {
+  padding-bottom: 20px;
+}
+
+.site-footer .footer-line {
+  margin-top: 0;
+  row-gap: 0;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+}
+
+/* On its own page the contact band fills the space under the header,
+   with the footer line at the bottom. */
+[data-page="contact"] main,
+[data-page="contact"] .contact,
+[data-page="contact"] .contact > .wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+[data-page="contact"] .contact-links {
+  margin-bottom: clamp(72px, 9vw, 120px);
+}
+
+[data-page="contact"] .footer-line {
+  margin-top: auto;
+}
+
 /* ==========================================================================
    Project panel
    ========================================================================== */
@@ -1626,6 +1665,44 @@ details[open] .run-toggle::after {
     bottom: 100%;
     width: 1px;
     height: 15px;
+  }
+}
+
+/* ==========================================================================
+   Page-to-page navigation
+   The header holds still while the page under it crossfades with a small
+   rise. Browsers without cross-document view transitions just navigate.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+    types: page;
+  }
+
+  .site-header {
+    view-transition-name: site-header;
+  }
+}
+
+:root:active-view-transition-type(page)::view-transition-old(root) {
+  animation: 120ms ease-in both page-out;
+}
+
+:root:active-view-transition-type(page)::view-transition-new(root) {
+  animation: 260ms var(--ease-out) both page-in;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 
