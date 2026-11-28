@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      // The site is one page. Old section pages (/about.html, /experience,
+      // /contact.html, ...) and old project links go to that part of it.
+      (function () {
+        var path = location.pathname.replace(/\/+$/, "");
+        var m = path.match(/^\/(about|experience|projects|skills|contact)(?:\.html)?$/);
+        if (m) location.replace("/" + (/^#project-[\w-]+$/.test(location.hash) ? location.hash : "#" + m[1]));
+        else if (/^\/project-[\w-]+$/.test(path)) location.replace("/#" + path.slice(1));
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#232323" />
+    <meta name="color-scheme" content="dark" />
+    <title>Page not found · Illy Hoang</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono&family=Hanken+Grotesk:wght@400;500&family=Newsreader:opsz@6..72&display=swap"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+
+  <body>
+    <main id="main">
+      <section class="section not-found" aria-labelledby="not-found-title">
+        <div class="wrap">
+          <p class="label">404</p>
+          <h1 id="not-found-title">Page not found</h1>
+          <p class="lede">There's nothing at this address. Everything on the site is on its one page.</p>
+          <div class="actions">
+            <a class="btn btn-solid" href="/">Go to the home page</a>
+            <a class="btn btn-outline" href="/#projects">See projects</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
