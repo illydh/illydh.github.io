@@ -18,7 +18,7 @@
   --action: #a1ffcb;
   --action-hover: #c4ffde;
   --action-ink: #232323;
-  /* pipeline graph */
+  /* graph pieces: the Skills stages (and the saved pipeline graph) */
   --node: #2c2c2c;
   --node-line: #454545;
   --edge: #5a5a5a;
@@ -260,7 +260,6 @@ h2 {
 }
 
 /* Links outside running text get a 44px tap height */
-.profiles .text-link,
 .contact-list .text-link,
 .sidehead .text-link {
   display: inline-flex;
@@ -272,7 +271,8 @@ h2 {
 .row-arrow,
 .sheet-links .btn::after,
 .run-check,
-.toast::before {
+.toast::before,
+.ph::before {
   --icon: none;
   background: currentColor;
   -webkit-mask: var(--icon) center / contain no-repeat;
@@ -522,7 +522,7 @@ h2 {
 
 /* ==========================================================================
    Cover
-   The About photo across the full width with the name running over it,
+   The photo across the full width with the name running over it,
    then the song, centred. The header stays hidden here until the page
    scrolls. The name is white because it sits on the photo.
    ========================================================================== */
@@ -741,39 +741,8 @@ h2 {
 }
 
 /* ==========================================================================
-   Introduction band (the old hero, below the cover)
+   Shared: lede, action row and the live status line
    ========================================================================== */
-
-.hero {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  padding-top: var(--section-space);
-  padding-bottom: 28px;
-}
-
-/* Faint canvas grid behind the graph side */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: radial-gradient(circle, var(--grid-dot) 1px, transparent 1.5px);
-  background-size: 24px 24px;
-  background-position: 12px 12px;
-  -webkit-mask-image: linear-gradient(90deg, transparent 32%, #000 70%);
-  mask-image: linear-gradient(90deg, transparent 32%, #000 70%);
-  pointer-events: none;
-}
-
-.hero-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  align-items: center;
-  gap: 24px;
-}
 
 .lede {
   margin-top: 28px;
@@ -783,71 +752,11 @@ h2 {
   color: var(--ink-2);
 }
 
-.hero-text > :first-child {
-  margin-top: 0;
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
-}
-
-.profiles {
-  display: flex;
-  gap: 24px;
-  margin-top: 14px;
-  font-size: 0.9375rem;
-  color: var(--muted);
-}
-
-.pipeline {
-  position: relative;
-  height: min(560px, 64svh);
-  min-height: 420px;
-}
-
-.pipeline canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  touch-action: manipulation;
-}
-
-.pipeline-pause {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 32px;
-  height: 32px;
-  color: var(--muted);
-  border-color: var(--line);
-}
-
-.pipeline[data-layout="wide"] .pipeline-pause {
-  top: 0;
-  bottom: auto;
-}
-
-.pipeline-pause .icon-play,
-.pipeline-pause[aria-pressed="true"] .icon-pause {
-  display: none;
-}
-
-.pipeline-pause[aria-pressed="true"] .icon-play {
-  display: block;
-}
-
-.label-long {
-  white-space: nowrap;
-}
-
-@media (max-width: 600px) {
-  .label-long {
-    display: none;
-  }
 }
 
 .status {
@@ -872,30 +781,6 @@ h2 {
   border-radius: 50%;
   background: var(--lit);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lit) 22%, transparent);
-}
-
-@media (max-width: 959px) {
-  .hero::before {
-    -webkit-mask-image: linear-gradient(180deg, transparent 45%, #000 80%);
-    mask-image: linear-gradient(180deg, transparent 45%, #000 80%);
-  }
-
-  .hero-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
-  }
-
-  .pipeline {
-    height: clamp(250px, 56vw, 460px);
-    min-height: 0;
-  }
-}
-
-@media (max-width: 860px) {
-  .pipeline-pause {
-    width: 44px;
-    height: 44px;
-  }
 }
 
 /* On load: the photo settles while the name fades in, then the song
@@ -933,7 +818,7 @@ h2 {
     opacity: 0;
   }
 
-  html:not([data-motion-paused]) [data-reveal="in"] {
+  [data-reveal="in"] {
     animation: rise 560ms var(--ease-out) backwards;
     animation-delay: var(--reveal-delay, 0ms);
   }
@@ -958,7 +843,13 @@ h2 {
     inset: 0;
     border-radius: 50%;
     background: var(--lit);
-    animation: ping 2.4s var(--ease-out) infinite;
+    animation: ping 2.4s var(--ease-out) 2;
+  }
+
+  /* The live dot pulses twice each time its line comes on screen: under five
+     seconds, so it needs no pause control. */
+  [data-reveal="out"] .run-dot::after {
+    animation: none;
   }
 }
 
@@ -1012,12 +903,6 @@ h2 {
   }
 }
 
-[data-motion-paused] *,
-[data-motion-paused] *::before,
-[data-motion-paused] *::after {
-  animation-play-state: paused !important;
-}
-
 /* ==========================================================================
    Sections
    ========================================================================== */
@@ -1026,12 +911,10 @@ h2 {
   padding-block: var(--section-space);
 }
 
-.hero + .section,
 .section + .section {
   padding-top: 0;
 }
 
-.hero + .section > .wrap,
 .section + .section > .wrap {
   padding-top: var(--section-space);
   border-top: 1px solid var(--line);
@@ -1088,20 +971,36 @@ h2 {
 
 /* About ------------------------------------------------------------------ */
 
-.portrait {
-  width: min(300px, 100%);
+.about-photo {
+  display: block;
+  width: min(360px, 100%);
   aspect-ratio: 4 / 5;
   margin-top: 32px;
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 62%;
   border-radius: 14px;
   background: var(--surface);
 }
 
+.about-body {
+  padding-top: 14px;
+}
+
+.about-lede {
+  max-width: 36rem;
+  margin-top: 18px;
+  font: 400 clamp(1.5rem, 2.25vw, 2.0625rem) / 1.28 var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.about-body .status {
+  padding-top: 0;
+}
+
 .prose {
   max-width: 40rem;
-  padding-top: 14px;
-  font-size: clamp(1.125rem, 1.5vw, 1.3125rem);
+  margin-top: 28px;
+  font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
   line-height: 1.55;
   color: var(--ink-2);
 }
@@ -1110,13 +1009,18 @@ h2 {
   margin-top: 1em;
 }
 
+.about-body .actions {
+  margin-top: 32px;
+}
+
 @media (max-width: 900px) {
-  .portrait {
-    width: min(320px, 100%);
+  .about-photo {
+    width: min(100%, 480px);
     aspect-ratio: 1;
+    margin-top: 24px;
   }
 
-  .prose {
+  .about-body {
     padding-top: 0;
   }
 }
@@ -1645,6 +1549,145 @@ details[open] .run-toggle::after {
   }
 }
 
+/* Gallery: a photo grid; each photo opens as a post ---------------------- */
+
+.gallery .sidehead .meta {
+  margin-top: 18px;
+}
+
+.meta .shot-count {
+  margin-right: 0;
+  color: inherit;
+}
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding-top: 14px;
+}
+
+.tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tile:focus-visible {
+  z-index: 1;
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stand-in until a photo is added: a faint hatch, an image icon and its
+   number. Neighbours alternate tones so the grid reads as tiles. */
+.ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background:
+    radial-gradient(120% 80% at 30% 20%, rgb(255 255 255 / 0.05), transparent 60%),
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.018) 0 2px, transparent 2px 12px);
+  font: 400 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.ph::before {
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Ccircle cx='9' cy='10' r='2'/%3E%3Cpath d='M3 17l5-5 4 4 3-3 6 6'/%3E%3C/g%3E%3C/svg%3E");
+  content: "";
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+}
+
+.shot:nth-child(2n) .tile {
+  background: #2f2f2f;
+}
+
+.shot:nth-child(3n) .tile {
+  background: #2a2a2a;
+}
+
+/* Hover (or keyboard focus): place and date, then the caption's first words */
+.peek {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.peek small {
+  font: 400 0.75rem/1.4 var(--font-mono);
+  color: rgb(255 255 255 / 0.8);
+}
+
+.tile:focus-visible .peek {
+  opacity: 1;
+}
+
+/* The preview replaces the placeholder's icon and number */
+.tile:focus-visible .ph {
+  color: transparent;
+}
+
+.tile:focus-visible .ph::before {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover .peek {
+    opacity: 1;
+  }
+
+  .tile:hover .ph {
+    color: transparent;
+  }
+
+  .tile:hover .ph::before {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .shots {
+    gap: 3px;
+    padding-top: 0;
+  }
+
+  .ph {
+    font-size: 0;
+  }
+
+  .ph::before {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 /* ==========================================================================
    Contact and footer
    ========================================================================== */
@@ -2020,6 +2063,298 @@ details[open] .run-toggle::after {
     bottom: 100%;
     width: 1px;
     height: 15px;
+  }
+}
+
+/* ==========================================================================
+   Gallery post
+   ========================================================================== */
+
+/* Desktop: the photo beside a panel with the place, caption and date, with
+   arrows either side and Close in the corner. Phones: the post fills the
+   screen, with Close at the top and the arrows at the bottom. */
+.post-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.post-dialog[open] {
+  display: grid;
+  place-items: center;
+}
+
+.post-dialog::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition: background-color 220ms ease;
+}
+
+.post-dialog.is-open::backdrop {
+  background: rgb(0 0 0 / 0.82);
+}
+
+.post {
+  --side: 360px;
+  display: grid;
+  grid-template-columns: auto var(--side);
+  height: min(780px, 100svh - 96px, (100vw - 176px - var(--side)) * 1.25);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 200ms ease,
+    transform 260ms var(--ease-out);
+}
+
+.post-dialog.is-open .post {
+  opacity: 1;
+  transform: none;
+}
+
+.post-media {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 4 / 5;
+  background: #1b1b1b;
+  touch-action: pan-y;
+}
+
+/* The whole photo, letterboxed if it isn't 4:5 */
+.post-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.post-media .ph {
+  font-size: 0.875rem;
+}
+
+.post-media .ph::before {
+  width: 32px;
+  height: 32px;
+}
+
+.post-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid var(--line);
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface);
+}
+
+.post-name {
+  font-weight: 500;
+}
+
+.post-place {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.post-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.post-caption {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.post-date {
+  margin-top: 16px;
+  font: 400 0.75rem/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.post-place:empty,
+.post-date:empty {
+  display: none;
+}
+
+.post-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  font: 400 0.75rem/1.4 var(--font-mono);
+  color: var(--muted);
+}
+
+.post-count {
+  color: var(--ink-2);
+}
+
+.post-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--outline);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms var(--ease-out);
+}
+
+.post-btn:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .post-btn:hover {
+    background: #383838;
+  }
+}
+
+/* Close and the arrows sit outside the post on wide screens */
+.post-close,
+.post-prev,
+.post-next {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.post-dialog.is-open :is(.post-close, .post-prev, .post-next) {
+  opacity: 1;
+}
+
+.post-close {
+  top: 20px;
+  right: 20px;
+  border-color: transparent;
+  background: none;
+  color: #fff;
+}
+
+.post-prev,
+.post-next {
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.post-prev {
+  left: 24px;
+}
+
+.post-next {
+  right: 24px;
+}
+
+.post-close-inline,
+.post-phone-nav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .post-dialog[open] {
+    display: block;
+  }
+
+  .post-dialog.is-open::backdrop {
+    background: var(--bg);
+  }
+
+  .post {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 0;
+    background: var(--bg);
+    box-shadow: none;
+  }
+
+  .post-side {
+    display: contents;
+  }
+
+  .post-head {
+    grid-row: 1;
+    padding: 8px 8px 8px 16px;
+    border-bottom: 0;
+  }
+
+  .post-close-inline {
+    display: grid;
+    margin-left: auto;
+    border-color: transparent;
+    background: none;
+  }
+
+  .post-media {
+    grid-row: 2;
+    width: 100%;
+    height: auto;
+  }
+
+  .post-body {
+    grid-row: 3;
+    padding: 16px;
+    overflow: visible;
+  }
+
+  .post-foot {
+    position: sticky;
+    bottom: 0;
+    grid-row: 4;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--bg);
+  }
+
+  .post-phone-nav {
+    display: flex;
+    gap: 8px;
+  }
+
+  .post-keys,
+  .post-close,
+  .post-prev,
+  .post-next {
+    display: none;
   }
 }
 

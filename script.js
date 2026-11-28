@@ -1,6 +1,3 @@
-import { mountPipeline } from "./pipeline.js";
-
-const root = document.documentElement;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
 /* Header and menu -------------------------------------------------------- */
@@ -66,14 +63,13 @@ navLinks.forEach((_, id) => {
 
 const revealBlocks = document.querySelectorAll(
   [
-    ".hero-text > *", ".hero .pipeline", ".hero .status",
-    ".section .sidehead > *", ".section .prose > *",
+    ".section .sidehead > *", ".about-body > :not(.prose)", ".section .prose > *",
     ".runs-head", ".run",
     ".section-head", ".result-head", ".result-rows > li", ".stage",
+    ".shots > li",
     ".contact .wrap > *",
   ].join(", ")
 );
-const motionPaused = () => root.hasAttribute("data-motion-paused");
 
 // Fully off screen: get ready to play again.
 const leaveObserver = new IntersectionObserver((entries) => {
@@ -96,12 +92,11 @@ const enterObserver = new IntersectionObserver(
       .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
     arriving.forEach((el, i) => {
       if (el === cover) {
-        // While the page's motion is paused the cover just stays still.
-        if (!motionPaused()) cover.removeAttribute("data-away");
+        cover.removeAttribute("data-away");
         return;
       }
       el.style.setProperty("--reveal-delay", `${Math.round(300 * (1 - 0.78 ** i))}ms`);
-      el.dataset.reveal = motionPaused() ? "done" : "in";
+      el.dataset.reveal = "in";
     });
   },
   { rootMargin: "-64px 0px 0px 0px", threshold: 0.1 }
@@ -118,13 +113,6 @@ document.addEventListener("animationcancel", settle);
   leaveObserver.observe(el);
   enterObserver.observe(el);
 });
-
-/* Hero pipeline ---------------------------------------------------------- */
-
-const pipelineCanvas = document.querySelector(".pipeline canvas");
-if (pipelineCanvas) {
-  mountPipeline(pipelineCanvas, { pauseButton: document.querySelector(".pipeline-pause") });
-}
 
 /* Projects: hover preview ------------------------------------------------ */
 
@@ -210,8 +198,27 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 let opener = null;
 let closing = false;
 
-// Visible, focusable controls inside the panel, in tab order.
-const panelControls = () => [...panel.querySelectorAll(FOCUSABLE)].filter((el) => el.getClientRects().length);
+// Keep Tab inside an open dialog: wrap from the last control to the first
+// and back, instead of stepping out to the browser's own toolbar.
+function keepTabInside(dialog) {
+  const controls = () => [...dialog.querySelectorAll(FOCUSABLE)].filter((el) => el.getClientRects().length);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab" || !dialog.open) return;
+    const items = controls();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    const inside = dialog.contains(active);
+    if (e.shiftKey && (active === first || !inside)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || !inside)) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+}
 
 function openProject(slug, from) {
   const tpl = document.getElementById(`project-${slug}`);
@@ -270,24 +277,7 @@ if (panel) {
     if (e.target === panel || e.target.closest("[data-close]")) closeProject();
   });
 
-  // Keep Tab inside the open panel: wrap from the last control to the first
-  // and back, instead of stepping out to the browser's own toolbar.
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Tab" || !panel.open) return;
-    const items = panelControls();
-    if (!items.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    const active = document.activeElement;
-    const inside = panel.contains(active);
-    if (e.shiftKey && (active === first || !inside)) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && (active === last || !inside)) {
-      e.preventDefault();
-      first.focus();
-    }
-  });
+  keepTabInside(panel);
 
   // Deep links: #project-<slug> opens that project.
   const fromHash = () => {
@@ -295,6 +285,141 @@ if (panel) {
     if (m) {
       document.getElementById("projects")?.scrollIntoView({ behavior: "instant" });
       openProject(m[1]);
+    }
+  };
+  addEventListener("hashchange", fromHash);
+  fromHash();
+}
+
+/* Gallery: photos open as posts ------------------------------------------ */
+// Each photo opens as a post: the photo beside its place, caption and date.
+// The arrows, ← → keys or a swipe move between photos (wrapping around);
+// Esc, the × or a click outside closes it. #photo-<n> opens photo n.
+
+const shots = [...document.querySelectorAll(".shot")];
+const postDialog = document.querySelector("dialog.post-dialog");
+
+if (shots.length && postDialog) {
+  const post = postDialog.querySelector(".post");
+  const slot = (name) => postDialog.querySelector(`[data-slot="${name}"]`);
+  const pad = (n) => String(n).padStart(2, "0");
+  let current = 0;
+  let postClosing = false;
+
+  const count = document.querySelector(".shot-count");
+  if (count) count.textContent = shots.length;
+
+  // Hover preview on each tile: place and date, then the caption's first words.
+  shots.forEach((shot) => {
+    const caption = shot.querySelector(".shot-caption")?.textContent.trim().replace(/\s+/g, " ") ?? "";
+    const words = caption.split(" ");
+    const peek = document.createElement("span");
+    peek.className = "peek";
+    peek.setAttribute("aria-hidden", "true");
+    peek.append([shot.dataset.place, shot.dataset.date].filter(Boolean).join(", "));
+    if (caption) {
+      const small = document.createElement("small");
+      small.textContent = words.length > 7 ? `${words.slice(0, 7).join(" ")}…` : caption;
+      peek.append(small);
+    }
+    shot.querySelector(".tile").append(peek);
+  });
+
+  function show(i) {
+    current = (i + shots.length) % shots.length;
+    const shot = shots[current];
+    const img = shot.querySelector(".tile img");
+    let media;
+    if (img) {
+      media = img.cloneNode();
+      media.loading = "eager";
+      media.sizes = "(max-width: 900px) 100vw, 640px";
+    } else {
+      media = shot.querySelector(".ph").cloneNode(true);
+    }
+    slot("media").replaceChildren(media);
+    slot("place").textContent = shot.dataset.place ?? "";
+    slot("date").textContent = shot.dataset.date ?? "";
+    slot("caption").replaceChildren(...(shot.querySelector(".shot-caption")?.cloneNode(true).childNodes ?? []));
+    slot("count").textContent = `${pad(current + 1)} / ${pad(shots.length)}`;
+    postDialog.setAttribute("aria-label", `Photo ${current + 1} of ${shots.length}`);
+    history.replaceState(null, "", `#photo-${current + 1}`);
+  }
+
+  function openPost(i) {
+    show(i);
+    if (!postDialog.open) postDialog.showModal();
+    // Start on whichever Close button this layout shows.
+    [...postDialog.querySelectorAll("[data-close]")].find((b) => b.getClientRects().length)?.focus({ preventScroll: true });
+    requestAnimationFrame(() => requestAnimationFrame(() => postDialog.classList.add("is-open")));
+  }
+
+  function closePost() {
+    if (!postDialog.open || postClosing) return;
+    postClosing = true;
+    postDialog.classList.remove("is-open");
+    const done = () => {
+      postClosing = false;
+      postDialog.close();
+      history.replaceState(null, "", "#gallery");
+      // Back on the photo that was showing, scrolled into view if needed.
+      const tile = shots[current].querySelector(".tile");
+      tile.focus({ preventScroll: true });
+      tile.scrollIntoView({ block: "nearest" });
+    };
+    if (reduceMotion.matches) return done();
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      post.removeEventListener("transitionend", onEnd);
+      done();
+    };
+    const onEnd = (e) => {
+      if (e.target === post) finish();
+    };
+    post.addEventListener("transitionend", onEnd);
+    setTimeout(finish, 320);
+  }
+
+  shots.forEach((shot, i) => shot.querySelector(".tile").addEventListener("click", () => openPost(i)));
+  postDialog.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    closePost();
+  });
+  postDialog.addEventListener("click", (e) => {
+    const step = e.target.closest("[data-step]");
+    if (step) show(current + Number(step.dataset.step));
+    else if (e.target === postDialog || e.target.closest("[data-close]")) closePost();
+  });
+  postDialog.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
+    show(current + (e.key === "ArrowRight" ? 1 : -1));
+  });
+
+  // Swipe sideways on the photo (touch and pen) to move between photos.
+  const media = slot("media");
+  let start = null;
+  media.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse") start = { x: e.clientX, y: e.clientY };
+  });
+  media.addEventListener("pointerup", (e) => {
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    start = null;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) show(current + (dx < 0 ? 1 : -1));
+  });
+  media.addEventListener("pointercancel", () => (start = null));
+
+  keepTabInside(postDialog);
+
+  const fromHash = () => {
+    const m = location.hash.match(/^#photo-(\d+)$/);
+    if (m && shots[m[1] - 1]) {
+      document.getElementById("gallery")?.scrollIntoView({ behavior: "instant" });
+      openPost(m[1] - 1);
     }
   };
   addEventListener("hashchange", fromHash);

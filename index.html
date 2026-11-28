@@ -17,7 +17,7 @@
       content="Aspiring data engineer and computer science master's student at USC."
     />
     <meta property="og:url" content="https://illydh.github.io/" />
-    <meta property="og:image" content="https://illydh.github.io/assets/portrait.webp" />
+    <meta property="og:image" content="https://illydh.github.io/assets/cover-1600.webp" />
     <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png" />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,6 +40,7 @@
           <li><a href="#experience">Experience</a></li>
           <li><a href="#projects">Projects</a></li>
           <li><a href="#skills">Skills</a></li>
+          <li><a href="#gallery">Gallery</a></li>
         </ul>
         <div class="nav-actions">
           <!-- Shown once the cover's song has been started -->
@@ -61,7 +62,7 @@
     </header>
 
     <main id="main">
-      <!-- COVER: the About photo with the name running across it, then a song -->
+      <!-- COVER: a photo with the name running across it, then a song -->
       <section class="cover" id="top" aria-labelledby="cover-title">
         <div class="cover-photo">
           <img
@@ -112,84 +113,47 @@
         </div>
       </section>
 
-      <!-- INTRODUCTION: lede, links and the live pipeline graph -->
-      <section class="hero" aria-labelledby="intro-title">
-        <h2 class="sr-only" id="intro-title">Introduction</h2>
-        <div class="wrap hero-grid">
-          <div class="hero-text">
-            <!-- Draft copy: to be settled with Illy -->
-            <p class="lede">
-              Aspiring data engineer finishing a master's in computer science at USC. I build pipelines
-              that take data from where it lands to where people can use it.
-            </p>
-            <div class="actions">
-              <a class="btn btn-solid" href="assets/resume.pdf" target="_blank" rel="noopener">Download résumé</a>
-              <a class="btn btn-outline" href="mailto:illyd.hoang@gmail.com">Email me</a>
-            </div>
-            <p class="profiles">
-              <a class="text-link" href="https://github.com/illydh">GitHub</a>
-              <a class="text-link" href="https://www.linkedin.com/in/illydh/">LinkedIn</a>
-            </p>
-          </div>
-
-          <div class="pipeline">
-            <canvas aria-hidden="true"></canvas>
-            <p class="sr-only">
-              Animated diagram of a data pipeline. Records from api, s3 and events sources pass through
-              parse, dedupe, orders and sessions steps into a warehouse, which feeds a dashboard, and into
-              a features step that feeds a model.
-            </p>
-            <button class="icon-btn pipeline-pause" type="button" aria-pressed="false" aria-label="Pause animation">
-              <svg class="icon-pause" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-                <path d="M4.5 2.5v9M9.5 2.5v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-              </svg>
-              <svg class="icon-play" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-                <path d="M4 2.5l7 4.5-7 4.5z" fill="currentColor" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <p class="wrap status">
-          <span class="run-dot" aria-hidden="true"></span>
-          <span class="run-word">running</span>
-          <span>Data Platform SWE Intern, The Aerospace Corporation</span>
-        </p>
-      </section>
-
-      <!-- ABOUT -->
+      <!-- ABOUT: who I am, what I'm doing now, and how to reach me -->
       <section class="section" id="about" aria-labelledby="about-title">
         <div class="wrap split">
           <div class="sidehead">
             <h2 id="about-title">About</h2>
             <img
-              class="portrait"
-              src="assets/portrait-640.webp"
-              srcset="assets/portrait-640.webp 640w, assets/portrait.webp 815w"
-              sizes="(max-width: 900px) 320px, 300px"
-              alt="Illy Hoang in a graduation stole, resting a hand on the UConn husky statue"
-              width="815"
-              height="815"
+              class="about-photo"
+              src="assets/about.webp"
+              alt="Illy Hoang smiling in a bandana and rain jacket on a hillside trail, with a wide river and mountains behind"
+              width="768"
+              height="1024"
               loading="lazy"
               decoding="async"
             />
           </div>
-          <div class="prose">
+          <div class="about-body">
+            <p class="status">
+              <span class="run-dot" aria-hidden="true"></span>
+              <span class="run-word">running</span>
+              <span>Data Platform SWE Intern, The Aerospace Corporation</span>
+            </p>
             <!-- Draft copy: to be settled with Illy -->
-            <p>
-              I'm finishing a master's in computer science at USC and interning on a data platform team at
-              The Aerospace Corporation.
+            <p class="about-lede">
+              Aspiring data engineer finishing a master's in computer science at USC. I build pipelines that take
+              data from where it lands to where people can use it.
             </p>
-            <p>
-              I like the unglamorous middle of the stack: getting data in, cleaning it, and making sure
-              it's there when someone needs it. I'm also drawn to machine learning and large language
-              models, and I'm always up for collaborating on projects and research that tackle real
-              problems.
-            </p>
-            <p>
-              Before USC I studied computer science and math at UConn, where I was a Ronald E. McNair
-              Scholar. Outside work I run, hike and box.
-            </p>
+            <div class="prose">
+              <p>
+                I like the unglamorous middle of the stack: getting data in, cleaning it, and making sure it's there
+                when someone needs it. I'm also drawn to machine learning and large language models, and I'm always
+                up for collaborating on projects and research that tackle real problems.
+              </p>
+              <p>
+                Before USC I studied computer science and math at UConn, where I was a Ronald E. McNair Scholar.
+                Outside work I run, hike and box.
+              </p>
+            </div>
+            <div class="actions">
+              <a class="btn btn-solid" href="assets/resume.pdf" target="_blank" rel="noopener">Download résumé</a>
+              <a class="btn btn-outline" href="mailto:illyd.hoang@gmail.com">Email me</a>
+            </div>
           </div>
         </div>
       </section>
@@ -454,6 +418,78 @@
           </ol>
         </div>
       </section>
+
+      <!-- GALLERY: photos from outside work; each opens as a post -->
+      <section class="section gallery" id="gallery" aria-labelledby="gallery-title">
+        <div class="wrap split">
+          <div class="sidehead">
+            <h2 id="gallery-title">Gallery</h2>
+            <p class="intro">A peek into my interests.</p>
+            <p class="meta"><span>photos</span> <span class="shot-count">9</span> posts</p>
+          </div>
+          <!--
+            One <li class="shot"> per photo, newest first. To add a real photo, swap the
+            placeholder <span class="ph"> for an <img> (see README), and fill in the
+            place, date and caption.
+          -->
+          <ul class="shots">
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 1">01</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 1: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 2">02</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 2: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 3">03</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 3: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 4">04</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 4: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 5">05</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 5: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 6">06</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 6: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 7">07</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 7: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 8">08</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 8: where it was and what was going on.</p>
+              </li>
+              <li class="shot" data-place="Place" data-date="Month Year">
+                <button class="tile" type="button" aria-haspopup="dialog">
+                  <span class="ph" role="img" aria-label="Placeholder photo 9">09</span>
+                </button>
+                <p class="shot-caption" hidden>Caption for photo 9: where it was and what was going on.</p>
+              </li>
+          </ul>
+        </div>
+      </section>
     </main>
 
     <!-- CONTACT AND FOOTER -->
@@ -500,6 +536,50 @@
         <p class="fine">© 2026 Illy Hoang</p>
       </div>
     </footer>
+
+    <!-- Gallery post: filled from the photo that was opened -->
+    <dialog class="post-dialog" aria-label="Photo">
+      <button class="post-btn post-close" type="button" data-close aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+      </button>
+      <button class="post-btn post-step post-prev" type="button" data-step="-1" aria-label="Previous photo">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+      <button class="post-btn post-step post-next" type="button" data-step="1" aria-label="Next photo">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+      <article class="post">
+        <div class="post-media" data-slot="media"></div>
+        <div class="post-side">
+          <header class="post-head">
+            <img class="avatar" src="assets/about-avatar.webp" alt="" width="40" height="40" />
+            <div>
+              <p class="post-name">Illy Hoang</p>
+              <p class="post-place" data-slot="place"></p>
+            </div>
+            <button class="post-btn post-close-inline" type="button" data-close aria-label="Close">
+              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+            </button>
+          </header>
+          <div class="post-body">
+            <p class="post-caption" data-slot="caption"></p>
+            <p class="post-date" data-slot="date"></p>
+          </div>
+          <footer class="post-foot">
+            <span class="post-count" data-slot="count"></span>
+            <span class="post-keys" aria-hidden="true">← → to browse · Esc to close</span>
+            <span class="post-phone-nav">
+              <button class="post-btn post-step" type="button" data-step="-1" aria-label="Previous photo">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </button>
+              <button class="post-btn post-step" type="button" data-step="1" aria-label="Next photo">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </button>
+            </span>
+          </footer>
+        </div>
+      </article>
+    </dialog>
 
     <!-- Project detail panel: filled from the templates below -->
     <dialog class="panel" aria-labelledby="panel-title">

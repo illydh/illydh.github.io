@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Cover redesign · mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono&family=Hanken+Grotesk:wght@400;500&family=Newsreader:opsz@6..72&display=swap" />
+<style>
+  /* Site tokens (dark default) */
+  .frame {
+    --bg: #232323; --surface: #2c2c2c; --ink: #f2f2f2; --ink-2: #d6d6d6; --muted: #a4a4a4;
+    --line: #3a3a3a; --outline: #4a4a4a; --accent: #a1ffcb; --action-ink: #232323;
+    --font-display: "Newsreader", Georgia, serif;
+    --font-text: "Hanken Grotesk", system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #e6e6e6; font-family: "Hanken Grotesk", system-ui, sans-serif; padding: 48px; }
+  .board { display: flex; flex-wrap: wrap; gap: 64px 48px; align-items: flex-start; }
+  .slot > .title { font: 500 15px/1.3 "Hanken Grotesk", sans-serif; color: #444; margin-bottom: 12px; }
+  .slot > .title span { color: #888; font-weight: 400; }
+
+  .frame {
+    position: relative; overflow: hidden; background: var(--bg); color: var(--ink);
+    font: 400 17px/1.55 var(--font-text); -webkit-font-smoothing: antialiased;
+  }
+  .frame.desktop { width: 1440px; height: 900px; }
+  .frame.phone { width: 390px; height: 844px; }
+  .page { position: absolute; inset: 0; }
+
+  /* ---------- Cover ---------- */
+  .cover { position: relative; height: 900px; display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 96px;
+           align-items: center; padding: 0 120px; }
+  .cover::before { /* faint dot grid on the photo side, like the old hero */
+    content: ""; position: absolute; inset: 0; z-index: 0;
+    background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1.5px);
+    background-size: 24px 24px; background-position: 12px 12px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 45%, #000 85%); mask-image: linear-gradient(90deg, transparent 45%, #000 85%);
+  }
+  .cover > * { position: relative; z-index: 1; }
+  .greet { font: 400 13px/1.4 var(--font-mono); color: var(--muted); letter-spacing: 0.04em; }
+  .name { margin-top: 32px; font: 400 184px/0.86 var(--font-display); letter-spacing: -0.03em; }
+  .name span { display: block; }
+
+  .play { display: flex; align-items: center; gap: 18px; margin-top: 56px; }
+  .play-btn { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+              background: var(--accent); color: var(--action-ink); border: 0; }
+  .play-text { display: grid; gap: 4px; }
+  .play-link { font: 500 19px/1.25 var(--font-text); color: var(--ink); text-decoration: underline;
+               text-decoration-color: rgb(242 242 242 / 0.35); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .play-meta { font: 400 12px/1.3 var(--font-mono); color: var(--muted); letter-spacing: 0.02em; }
+  .sub { margin-top: 22px; max-width: 30rem; font-size: 17px; color: var(--muted); }
+
+  .photo { height: 614px; width: 460px; border-radius: 16px; overflow: hidden; background: var(--surface); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 63% 30%; display: block; }
+  .photo-cap { margin-top: 12px; font: 400 12px/1.3 var(--font-mono); color: var(--muted); }
+
+  .scroll-cue { position: absolute; left: 120px; bottom: 36px; display: flex; align-items: center; gap: 12px;
+                font: 400 12px/1 var(--font-mono); color: var(--muted); z-index: 1; }
+  .scroll-cue i { display: block; width: 48px; height: 1px; background: var(--outline); }
+
+  /* Spotify compact player (placeholder for the real embed) */
+  .spotify { display: flex; align-items: center; gap: 14px; width: 420px; height: 80px; padding: 8px 16px 8px 8px; border-radius: 12px;
+             background: linear-gradient(100deg, #3d3446, #2e2a36); color: #fff; position: relative; overflow: hidden; }
+  .spotify .art { width: 64px; height: 64px; border-radius: 6px; flex: none;
+                  background: radial-gradient(circle at 30% 30%, #e9a46b, #8a3f6e 55%, #2d2a52); }
+  .spotify .meta { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .spotify .t { font: 600 15px/1.2 var(--font-text); }
+  .spotify .a { font: 400 13px/1.2 var(--font-text); color: rgb(255 255 255 / 0.7); }
+  .spotify .brand { font: 600 11px/1 var(--font-text); color: rgb(255 255 255 / 0.75); letter-spacing: 0.02em; }
+  .spotify .pp { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #000; display: grid; place-items: center; flex: none; }
+  .spotify .bar { position: absolute; left: 86px; right: 16px; bottom: 8px; height: 3px; border-radius: 2px; background: rgb(255 255 255 / 0.2); }
+  .spotify .bar::after { content: ""; position: absolute; inset: 0 62% 0 0; border-radius: 2px; background: #fff; }
+  .spot-label { margin-top: 10px; font: 400 12px/1.3 var(--font-mono); color: var(--muted); }
+
+  /* Header, shown once the page scrolls */
+  .header { position: absolute; top: 0; left: 0; right: 0; height: 73px; z-index: 5;
+            background: rgb(35 35 35 / 0.86); -webkit-backdrop-filter: saturate(140%) blur(12px); backdrop-filter: saturate(140%) blur(12px);
+            border-bottom: 1px solid var(--line); }
+  .header .nav { height: 72px; display: flex; align-items: center; gap: 32px; padding: 0 120px; }
+  .wordmark { font: 500 17px/1 var(--font-text); }
+  .links { display: flex; gap: 32px; margin-left: auto; font-size: 15px; color: var(--muted); }
+  .links b { color: var(--ink); font-weight: 400; box-shadow: inset 0 -1px 0 currentColor; padding-bottom: 6px; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--outline); display: grid; place-items: center; color: var(--ink); flex: none; }
+  .now { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px 0 14px; border: 1px solid var(--outline); border-radius: 999px;
+         font: 400 13px/1 var(--font-text); color: var(--ink-2); max-width: 260px; }
+  .now .np { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .now .pause { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--action-ink); display: grid; place-items: center; flex: none; }
+  .eq { display: flex; align-items: flex-end; gap: 2px; height: 12px; flex: none; }
+  .eq i { width: 3px; background: var(--accent); border-radius: 1px; display: block; }
+  .eq i:nth-child(1) { height: 7px; } .eq i:nth-child(2) { height: 12px; } .eq i:nth-child(3) { height: 5px; }
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  /* Intro band peeking below the cover in the scrolled state */
+  .band { padding: 72px 120px 0; display: grid; grid-template-columns: 5fr 7fr; gap: 24px; align-items: center; height: 520px; }
+  .band .lede { font-size: 21px; color: var(--ink-2); max-width: 33rem; }
+  .band .pipe { height: 420px; border-radius: 12px; border: 1px dashed var(--outline); display: grid; place-items: center;
+                font: 400 13px/1 var(--font-mono); color: var(--muted); }
+
+  /* ---------- Phone ---------- */
+  .phone .cover { height: 844px; display: block; padding: 56px 24px 0; }
+  .phone .cover::before { display: none; }
+  .phone .name { margin-top: 14px; font-size: 76px; }
+  .phone .photo { width: 342px; height: 360px; margin-top: 28px; border-radius: 14px; }
+  .phone .photo img { object-position: 66% 28%; }
+  .phone .play { margin-top: 26px; gap: 14px; }
+  .phone .play-btn { width: 56px; height: 56px; }
+  .phone .play-link { font-size: 17px; }
+  .phone .sub { margin-top: 14px; font-size: 16px; }
+  .phone .scroll-cue { left: 24px; bottom: 24px; }
+  .phone .spotify { width: 342px; }
+  .phone .header { height: 65px; }
+  .phone .header .nav { height: 64px; padding: 0 24px; gap: 10px; }
+  .phone .now { padding: 0 4px 0 12px; }
+  .phone .band { display: block; height: auto; padding: 56px 24px 0; }
+  .phone .band .lede { font-size: 18px; }
+  .phone .band .pipe { height: 260px; margin-top: 32px; }
+  .phone .menu { height: 44px; padding: 0 16px; border: 1px solid var(--outline); border-radius: 10px; display: grid; place-items: center; font: 500 15px/1 var(--font-text); }
+
+  /* Notes */
+  .notes { width: 1440px; background: #fff; color: #222; border-radius: 12px; padding: 40px 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 48px; }
+  .notes h3 { font: 500 15px/1.3 "Hanken Grotesk", sans-serif; margin-bottom: 8px; }
+  .notes p, .notes li { font-size: 14.5px; line-height: 1.55; color: #444; }
+  .notes ul { padding-left: 18px; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="board">
+
+  <!-- 1. Desktop, at the top: no header -->
+  <div class="slot">
+    <p class="title">1 · Desktop, at the top <span>— no header until you scroll</span></p>
+    <section class="frame desktop" id="f1">
+      <div class="page">
+        <div class="cover">
+          <div>
+            <p class="greet">Hi, welcome in. I'm</p>
+            <h1 class="name"><span>Illy</span><span>Hoang</span></h1>
+            <div class="play">
+              <span class="play-btn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M7 4.5v13l11-6.5z" fill="currentColor"/></svg></span>
+              <div class="play-text">
+                <a class="play-link">Play “Song title” by Artist</a>
+                <span class="play-meta">via Spotify</span>
+              </div>
+            </div>
+            <p class="sub">Click play and scroll to learn more about me.</p>
+          </div>
+          <figure>
+            <div class="photo"><img src="portrait.webp" alt="" /></div>
+          </figure>
+        </div>
+        <p class="scroll-cue"><i></i>scroll</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. Desktop, after pressing play -->
+  <div class="slot">
+    <p class="title">2 · Desktop, after pressing play <span>— Spotify's compact player takes the link's place; still no header</span></p>
+    <section class="frame desktop" id="f2">
+      <div class="page">
+        <div class="cover">
+          <div>
+            <p class="greet">Hi, welcome in. I'm</p>
+            <h1 class="name"><span>Illy</span><span>Hoang</span></h1>
+            <div class="play">
+              <div class="spotify">
+                <div class="art"></div>
+                <div class="meta"><span class="t">Song title</span><span class="a">Artist</span><span class="brand">Spotify</span></div>
+                <span class="pp" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M4.5 2.5v9M9.5 2.5v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+                <span class="bar"></span>
+              </div>
+            </div>
+            <p class="sub">Now scroll. It keeps playing while you look around.</p>
+          </div>
+          <figure>
+            <div class="photo"><img src="portrait.webp" alt="" /></div>
+          </figure>
+        </div>
+        <p class="scroll-cue"><i></i>scroll</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. Desktop, scrolling: header shows, with a now-playing pill -->
+  <div class="slot">
+    <p class="title">3 · Desktop, scrolling <span>— header slides in with a now-playing pill to pause; it leaves again at the very top</span></p>
+    <section class="frame desktop" id="f3">
+      <div class="page" style="top: -330px">
+        <div class="cover">
+          <div>
+            <p class="greet">Hi, welcome in. I'm</p>
+            <h1 class="name"><span>Illy</span><span>Hoang</span></h1>
+            <div class="play">
+              <div class="spotify">
+                <div class="art"></div>
+                <div class="meta"><span class="t">Song title</span><span class="a">Artist</span><span class="brand">Spotify</span></div>
+                <span class="pp" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M4.5 2.5v9M9.5 2.5v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+                <span class="bar"></span>
+              </div>
+            </div>
+            <p class="sub">Now scroll. It keeps playing while you look around.</p>
+          </div>
+          <figure>
+            <div class="photo"><img src="portrait.webp" alt="" /></div>
+          </figure>
+        </div>
+        <div class="band">
+          <p class="lede">Aspiring data engineer finishing a master's in computer science at USC. I build pipelines that take data from where it lands to where people can use it.</p>
+          <div class="pipe">live pipeline graph (unchanged)</div>
+        </div>
+      </div>
+      <header class="header">
+        <div class="nav">
+          <span class="wordmark">Illy Hoang</span>
+          <nav class="links"><span>About</span><span>Experience</span><span>Projects</span><span>Skills</span><span>Contact</span></nav>
+          <div class="nav-actions">
+            <span class="now"><span class="eq"><i></i><i></i><i></i></span><span class="np">Song title · Artist</span>
+              <span class="pause" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2.5v7M8 2.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></span>
+            <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.5v1.8M9 14.7v1.8M1.5 9h1.8M14.7 9h1.8M3.7 3.7l1.3 1.3M13 13l1.3 1.3M3.7 14.3L5 13M13 5l1.3-1.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          </div>
+        </div>
+      </header>
+    </section>
+  </div>
+
+  <!-- 4. Phone, at the top -->
+  <div class="slot">
+    <p class="title">4 · Phone, at the top</p>
+    <section class="frame phone" id="f4">
+      <div class="page">
+        <div class="cover">
+          <p class="greet">Hi, welcome in. I'm</p>
+          <h1 class="name"><span>Illy</span><span>Hoang</span></h1>
+          <div class="photo"><img src="portrait.webp" alt="" /></div>
+          <div class="play">
+            <span class="play-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 22 22"><path d="M7 4.5v13l11-6.5z" fill="currentColor"/></svg></span>
+            <div class="play-text">
+              <a class="play-link">Play “Song title” by Artist</a>
+              <span class="play-meta">via Spotify</span>
+            </div>
+          </div>
+          <p class="sub">Click play and scroll to learn more about me.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 5. Phone, playing and scrolled -->
+  <div class="slot">
+    <p class="title">5 · Phone, playing and scrolled</p>
+    <section class="frame phone" id="f5">
+      <div class="page" style="top: -470px">
+        <div class="cover">
+          <p class="greet">Hi, welcome in. I'm</p>
+          <h1 class="name"><span>Illy</span><span>Hoang</span></h1>
+          <div class="photo"><img src="portrait.webp" alt="" /></div>
+          <div class="play">
+            <div class="spotify">
+              <div class="art"></div>
+              <div class="meta"><span class="t">Song title</span><span class="a">Artist</span><span class="brand">Spotify</span></div>
+              <span class="pp" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M4.5 2.5v9M9.5 2.5v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <span class="bar"></span>
+            </div>
+          </div>
+          <p class="sub">Now scroll. It keeps playing while you look around.</p>
+        </div>
+        <div class="band">
+          <p class="lede">Aspiring data engineer finishing a master's in computer science at USC. I build pipelines that take data from where it lands to where people can use it.</p>
+          <div class="pipe">live pipeline graph (unchanged)</div>
+        </div>
+      </div>
+      <header class="header">
+        <div class="nav">
+          <span class="wordmark">Illy Hoang</span>
+          <span style="margin-left:auto" class="now"><span class="eq"><i></i><i></i><i></i></span>
+            <span class="pause" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2.5v7M8 2.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></span>
+          <span class="icon-btn" style="width:44px;height:44px"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.5v1.8M9 14.7v1.8M1.5 9h1.8M14.7 9h1.8M3.7 3.7l1.3 1.3M13 13l1.3 1.3M3.7 14.3L5 13M13 5l1.3-1.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="menu">Menu</span>
+        </div>
+      </header>
+    </section>
+  </div>
+
+  <!-- 6. Behaviour notes -->
+  <div class="slot">
+    <p class="title">6 · How it behaves</p>
+    <div class="notes">
+      <div>
+        <h3>Header</h3>
+        <ul>
+          <li>Hidden at the very top of the page.</li>
+          <li>Slides down (about 200ms) as soon as the page scrolls.</li>
+          <li>Slides away again when the visitor scrolls back to the top.</li>
+          <li>Keyboard users get it back the moment focus moves past the cover; reduced motion shows and hides it without the slide.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>The song (Spotify)</h3>
+        <ul>
+          <li>"Play …" swaps in Spotify's compact player in the same spot and starts it.</li>
+          <li>Visitors not logged in to Spotify hear a 30-second preview; logged-in visitors hear the whole track.</li>
+          <li>If a browser (iOS Safari) won't start it from our link, the visitor taps the player, which is now right there.</li>
+          <li>While it plays, the header's pill shows it and pauses it from anywhere on the page.</li>
+          <li>Nothing plays until the visitor asks; the player loads only then.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Photo and the rest of the page</h3>
+        <ul>
+          <li>The About photo, cropped to 3:4 around you and the husky.</li>
+          <li>The About section shows the same photo today. Suggest dropping it there so it isn't shown twice.</li>
+          <li>Below the cover: the intro band with the live pipeline graph, then About, Experience, Projects, Skills and Contact, unchanged.</li>
+          <li>Entrance: the name rises, then the play link and photo follow, once on load.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
