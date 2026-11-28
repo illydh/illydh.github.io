@@ -53,14 +53,16 @@ From the top:
 1. **Cover**: my photo across the full width with my name running over it, and a song to play while you scroll (Spotify). The header stays hidden until the page scrolls.
 2. **Introduction**: a short intro, résumé and email buttons, and a live pipeline graph you can hover.
 3. **About**, **Experience**, **Projects** (each opens a detail panel; `#project-<slug>` links straight to one) and **Skills**.
-4. **Contact**: the footer band; clicking the address copies it.
+4. **Footer**: "Let's connect" with LinkedIn and GitHub, the email (with a copy button), the résumé, and "Back to top", which returns to the cover.
 
-Dark is the default theme, and the toggle remembers a visitor's choice. `404.html` is shown for unknown addresses and sends old links such as `/about.html` to the matching section.
+Each block rises into place as it comes on screen, and plays again whenever it comes back after you've scrolled away; the cover replays its entrance the same way. With reduced motion turned on, or the pipeline's pause button pressed, nothing moves.
+
+The site has one theme, dark. `404.html` is shown for unknown addresses and sends old links such as `/about.html` to the matching section.
 
 ```
 index.html     the page
 style.css      all styles; colours are tokens at the top
-script.js      theme, menu, cover header, project preview and panel, copy-the-email
+script.js      menu, cover header, scroll-in, project preview and panel, copy-the-email
 pipeline.js    the hero pipeline graph (canvas)
 404.html       not-found page and old-link redirects
 assets/        cover photo, portrait, icons, résumé, project images and reports
