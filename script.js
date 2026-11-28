@@ -56,9 +56,37 @@ document.addEventListener("keydown", (e) => {
 });
 narrow.addEventListener("change", () => setMenu(false));
 
-const onScroll = () => header.toggleAttribute("data-scrolled", scrollY > 8);
+// On the cover the header stays hidden until the page moves, and hides again
+// back at the very top (see .site-header[data-hidden]).
+const cover = document.querySelector(".cover");
+const onScroll = () => {
+  header.toggleAttribute("data-scrolled", scrollY > 8);
+  header.toggleAttribute("data-hidden", !!cover && scrollY <= 2 && header.dataset.menu !== "open");
+};
 addEventListener("scroll", onScroll, { passive: true });
+addEventListener("resize", onScroll, { passive: true });
 onScroll();
+
+// Mark the nav link for the section in view.
+const navLinks = new Map(
+  [...header.querySelectorAll(".nav-links a")].map((a) => [a.getAttribute("href").slice(1), a])
+);
+const sectionObserver = new IntersectionObserver(
+  (entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      navLinks.forEach((a, id) => {
+        if (id === entry.target.id) a.setAttribute("aria-current", "location");
+        else a.removeAttribute("aria-current");
+      });
+    }
+  },
+  { rootMargin: "-45% 0px -50% 0px" }
+);
+navLinks.forEach((_, id) => {
+  const el = document.getElementById(id);
+  if (el) sectionObserver.observe(el);
+});
 
 /* Hero pipeline ---------------------------------------------------------- */
 
@@ -180,8 +208,7 @@ function closeProject() {
     closing = false;
     panel.close();
     rows.forEach((r) => r.classList.remove("is-active"));
-    // Drop the #project-<slug> hash but stay on this page.
-    history.replaceState(null, "", location.pathname + location.search);
+    history.replaceState(null, "", "#projects");
     opener?.focus({ preventScroll: true });
   };
   if (reduceMotion.matches) done();
@@ -267,3 +294,102 @@ email?.addEventListener("click", async (e) => {
     location.href = email.href;
   }
 });
+
+/* Cover: pause the moving name -------------------------------------------- */
+
+const tickerPause = document.querySelector(".ticker-pause");
+tickerPause?.addEventListener("click", () => {
+  const paused = tickerPause.getAttribute("aria-pressed") !== "true";
+  tickerPause.setAttribute("aria-pressed", String(paused));
+  tickerPause.setAttribute("aria-label", paused ? "Play the moving name" : "Pause the moving name");
+  cover.toggleAttribute("data-ticker-paused", paused);
+});
+
+/* Cover: the song --------------------------------------------------------- */
+// Without JavaScript the link opens the song on Spotify. With it, the first
+// press swaps in Spotify's compact player in the same place and starts it,
+// and the header's now-playing pill pauses or resumes it from anywhere.
+// Nothing from Spotify loads until a visitor points at, focuses or presses
+// the link.
+
+const song = document.querySelector(".song[data-spotify-uri]");
+const songSlot = document.querySelector(".song-slot");
+const songHint = document.querySelector(".song-hint");
+const nowPlaying = document.querySelector(".now-playing");
+const nowToggle = nowPlaying?.querySelector(".now-toggle");
+const SONG = "Take Me for a Ride";
+let spotify = null;
+let player = null;
+
+function loadSpotify() {
+  spotify ??= new Promise((resolve, reject) => {
+    window.onSpotifyIframeApiReady = resolve;
+    const script = document.createElement("script");
+    script.src = "https://open.spotify.com/embed/iframe-api/v1";
+    script.async = true;
+    script.onerror = reject;
+    document.head.append(script);
+  });
+  return spotify;
+}
+
+// Spotify didn't load (offline, or blocked): say so and leave the link to
+// open the song on Spotify.
+function songFallback() {
+  song.dataset.fallback = "";
+  const open = document.createElement("a");
+  open.className = "text-link";
+  open.href = song.href;
+  open.target = "_blank";
+  open.rel = "noopener";
+  open.textContent = "open it on Spotify";
+  songHint.replaceChildren("The player didn't load here; ", open, ".");
+}
+
+if (song && songSlot && songHint && nowPlaying && nowToggle) {
+  const warm = () => loadSpotify().catch(() => {});
+  song.addEventListener("pointerenter", warm, { once: true });
+  song.addEventListener("focus", warm, { once: true });
+
+  song.addEventListener("click", async (e) => {
+    if ("fallback" in song.dataset) return; // let the link open Spotify
+    e.preventDefault();
+    songHint.textContent = "Loading the player…";
+    let api;
+    try {
+      api = await Promise.race([loadSpotify(), new Promise((_, reject) => setTimeout(reject, 8000))]);
+    } catch {
+      songFallback();
+      return;
+    }
+
+    const host = document.createElement("div");
+    songSlot.replaceChildren(host);
+    api.createController(host, { uri: song.dataset.spotifyUri, width: "100%", height: 80 }, (controller) => {
+      player = controller;
+      nowPlaying.hidden = false;
+      // Keep keyboard focus where the link was: on the player that replaced it.
+      songSlot.querySelector("iframe")?.focus({ preventScroll: true });
+
+      let started = false;
+      controller.addListener("ready", () => {
+        controller.play();
+        // Some browsers (iOS Safari) only start it from the player's own button.
+        setTimeout(() => {
+          if (!started) songHint.textContent = "Press play in the player to start it.";
+        }, 2500);
+      });
+      controller.addListener("playback_update", ({ data }) => {
+        const playing = !data.isPaused;
+        if (playing && !started) {
+          started = true;
+          songHint.textContent = "Now scroll. It keeps playing while you look around.";
+        }
+        nowPlaying.toggleAttribute("data-playing", playing);
+        nowToggle.setAttribute("aria-label", `${playing ? "Pause" : "Play"} ${SONG}`);
+      });
+    });
+  });
+
+  nowToggle.addEventListener("click", () => player?.togglePlay());
+}

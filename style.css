@@ -102,19 +102,12 @@ html:has(dialog[open]) {
 }
 
 body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
   font: 400 1.0625rem/1.55 var(--font-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-main {
-  flex: 1;
 }
 
 img,
@@ -195,7 +188,7 @@ ol {
   color: var(--muted);
 }
 
-h1 {
+h2 {
   font: 400 clamp(2.5rem, 4.4vw, 4rem) / 1 var(--font-display);
   letter-spacing: -0.02em;
 }
@@ -319,18 +312,127 @@ h1 {
    ========================================================================== */
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 20;
   background: color-mix(in srgb, var(--bg) 86%, transparent);
   -webkit-backdrop-filter: saturate(140%) blur(12px);
   backdrop-filter: saturate(140%) blur(12px);
   border-bottom: 1px solid transparent;
-  transition: border-color 200ms ease;
+  transition:
+    border-color 200ms ease,
+    transform 260ms var(--ease-out),
+    visibility 0s;
 }
 
 .site-header[data-scrolled] {
   border-bottom-color: var(--line);
+}
+
+/* On the cover the header stays out of the way until the page moves:
+   script.js sets data-hidden at the very top. It slides away, then stops
+   taking focus. */
+.site-header[data-hidden] {
+  transform: translateY(-100%);
+  visibility: hidden;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease-in,
+    visibility 0s linear 200ms;
+}
+
+/* Now playing: shown once the cover's song has been started */
+.now-playing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 4px 0 14px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.now-playing[hidden] {
+  display: none;
+}
+
+.now-title {
+  max-width: 15rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.now-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--action-ink);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.now-toggle:active {
+  transform: scale(0.92);
+}
+
+.now-toggle .icon-play {
+  display: none;
+}
+
+.now-playing:not([data-playing]) .now-toggle .icon-pause {
+  display: none;
+}
+
+.now-playing:not([data-playing]) .now-toggle .icon-play {
+  display: block;
+}
+
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.eq i {
+  display: block;
+  width: 3px;
+  height: 12px;
+  border-radius: 1px;
+  background: var(--lit);
+  transform-origin: bottom;
+  transform: scaleY(0.35);
+}
+
+.now-playing[data-playing] .eq i:nth-child(1) { transform: scaleY(0.6); }
+.now-playing[data-playing] .eq i:nth-child(2) { transform: scaleY(1); }
+.now-playing[data-playing] .eq i:nth-child(3) { transform: scaleY(0.45); }
+
+@media (max-width: 860px) {
+  .now-playing {
+    height: 46px;
+    padding: 0 0 0 12px;
+  }
+
+  .now-title {
+    display: none;
+  }
+
+  .now-toggle {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .nav {
@@ -459,7 +561,227 @@ h1 {
 }
 
 /* ==========================================================================
-   Hero
+   Cover
+   The About photo across the full width with the name running over it,
+   then the song, centred. The header stays hidden here until the page
+   scrolls. The name is white in both themes because it sits on the photo.
+   ========================================================================== */
+
+.cover {
+  --photo-h: 76%;
+  /* How far above the photo's bottom edge the name runs */
+  --name-lift: 4%;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.cover-photo {
+  position: relative;
+  flex: none;
+  height: var(--photo-h);
+  overflow: hidden;
+  background: #1b1b1b;
+}
+
+.cover-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 51% 0%;
+}
+
+/* Darker toward the bottom, where the name runs, so white lettering holds */
+.cover-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 0.16) 0%,
+    rgb(0 0 0 / 0.08) 38%,
+    rgb(0 0 0 / 0.32) 66%,
+    rgb(0 0 0 / 0.56) 100%
+  );
+}
+
+/* The name runs edge to edge across the lower part of the photo, below the
+   face, as a slow loop (see the motion block); the track holds two
+   identical halves, so moving it by half is seamless */
+.ticker {
+  position: absolute;
+  z-index: 1;
+  bottom: calc(100% - var(--photo-h) + var(--name-lift));
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  color: #fff;
+  font: 800 clamp(3.5rem, 9.6vw, 9.375rem) / 1 var(--font-text);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.18);
+}
+
+.ticker-track {
+  display: inline-flex;
+}
+
+.ticker-track > span {
+  padding-right: 0.42em;
+}
+
+.cover[data-ticker-paused] .ticker-track {
+  animation-play-state: paused;
+}
+
+/* Pause for the moving name (anything that moves for more than five
+   seconds needs one); top corner of the photo, clear of the name */
+.ticker-pause {
+  position: absolute;
+  z-index: 2;
+  top: clamp(16px, 2.2vw, 28px);
+  right: clamp(16px, 2.2vw, 28px);
+  border-color: rgb(255 255 255 / 0.4);
+  background: rgb(0 0 0 / 0.32);
+  color: #fff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+@media (hover: hover) {
+  .ticker-pause:hover {
+    border-color: #fff;
+    background: rgb(0 0 0 / 0.5);
+  }
+}
+
+.ticker-pause .icon-play,
+.ticker-pause[aria-pressed="true"] .icon-pause {
+  display: none;
+}
+
+.ticker-pause[aria-pressed="true"] .icon-play {
+  display: block;
+}
+
+/* Below the photo: the song, centred */
+.cover-song {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px var(--gutter);
+  text-align: center;
+}
+
+.song-slot {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.song {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 22px 7px 7px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms var(--ease-out);
+}
+
+.song:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .song:hover {
+    border-color: var(--ink);
+    background: var(--surface);
+  }
+}
+
+.song-play {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--action-ink);
+}
+
+.song-text {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.song-title {
+  font-weight: 500;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+}
+
+.song-meta {
+  font: 400 0.75rem/1.3 var(--font-mono);
+  color: var(--muted);
+}
+
+.song-hint {
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* Spotify's compact player, once the song has been started */
+.song-slot iframe {
+  display: block;
+  width: min(440px, 100%);
+  height: 80px;
+  border: 0;
+  border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+  .cover {
+    --photo-h: 70%;
+    --name-lift: 14%;
+  }
+
+  .song-play {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* 404 page */
+.not-found {
+  min-height: 100svh;
+  padding-top: calc(var(--header-h) + var(--section-space));
+}
+
+.not-found h1 {
+  margin-top: 16px;
+  font: 400 clamp(2.5rem, 4.4vw, 4rem) / 1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Introduction band (the old hero, below the cover)
    ========================================================================== */
 
 .hero {
@@ -467,8 +789,7 @@ h1 {
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  min-height: calc(100svh - var(--header-h));
-  padding-top: clamp(24px, 6vh, 88px);
+  padding-top: var(--section-space);
   padding-bottom: 28px;
 }
 
@@ -494,22 +815,16 @@ h1 {
   gap: 24px;
 }
 
-.hero-name {
-  margin-top: 18px;
-  font: 400 clamp(4.75rem, 10.8vw, 9.75rem) / 0.88 var(--font-display);
-  letter-spacing: -0.025em;
-}
-
-.hero-name span {
-  display: block;
-}
-
 .lede {
   margin-top: 28px;
   max-width: 33rem;
   font-size: clamp(1.0625rem, 1.46vw, 1.3125rem);
   line-height: 1.5;
   color: var(--ink-2);
+}
+
+.hero-text > :first-child {
+  margin-top: 0;
 }
 
 .actions {
@@ -589,13 +904,6 @@ h1 {
   color: var(--lit);
 }
 
-/* The role links to Experience; the padding gives it a 44px tap height
-   without making the line taller. */
-.status .text-link {
-  padding-block: 14px;
-  margin-block: -14px;
-}
-
 .run-dot {
   position: relative;
   flex: none;
@@ -607,10 +915,6 @@ h1 {
 }
 
 @media (max-width: 959px) {
-  .hero {
-    min-height: 0;
-  }
-
   .hero::before {
     -webkit-mask-image: linear-gradient(180deg, transparent 45%, #000 80%);
     mask-image: linear-gradient(180deg, transparent 45%, #000 80%);
@@ -634,17 +938,40 @@ h1 {
   }
 }
 
-/* One entrance on load; nothing else moves because the page scrolled. */
+/* On load: the photo settles while the name fades in, then the song
+   follows. The name then drifts slowly sideways in a loop. Nothing else
+   moves because the page scrolled. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-text > :not(.hero-name),
-  .hero-name > span {
-    animation: rise 680ms var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 70ms + 60ms);
+  .cover-photo img {
+    animation: settle 1400ms var(--ease-out) backwards;
   }
 
-  .pipeline {
-    animation: fade 900ms ease both;
-    animation-delay: 260ms;
+  .ticker {
+    animation: fade 900ms ease backwards;
+    animation-delay: 150ms;
+  }
+
+  .ticker-track {
+    animation: ticker 60s linear infinite;
+  }
+
+  .cover-song {
+    animation: rise 640ms var(--ease-out) backwards;
+    animation-delay: 420ms;
+  }
+
+  .now-playing[data-playing] .eq i {
+    animation: eq 900ms ease-in-out infinite alternate;
+  }
+
+  .now-playing[data-playing] .eq i:nth-child(2) {
+    animation-duration: 700ms;
+    animation-delay: -300ms;
+  }
+
+  .now-playing[data-playing] .eq i:nth-child(3) {
+    animation-duration: 1100ms;
+    animation-delay: -600ms;
   }
 
   .run-dot::after {
@@ -664,9 +991,34 @@ h1 {
   }
 }
 
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
 @keyframes fade {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(-6%);
+  }
+  to {
+    transform: translateX(-56%);
+  }
+}
+
+@keyframes eq {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
   }
 }
 
@@ -694,6 +1046,17 @@ h1 {
 
 .section {
   padding-block: var(--section-space);
+}
+
+.hero + .section,
+.section + .section {
+  padding-top: 0;
+}
+
+.hero + .section > .wrap,
+.section + .section > .wrap {
+  padding-top: var(--section-space);
+  border-top: 1px solid var(--line);
 }
 
 .split {
@@ -1415,40 +1778,6 @@ details[open] .run-toggle::after {
   color: var(--ink);
 }
 
-/* Slim footer on every page but Contact */
-.site-footer {
-  padding-bottom: 20px;
-}
-
-.site-footer .footer-line {
-  margin-top: 0;
-  row-gap: 0;
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 20px;
-}
-
-/* On its own page the contact band fills the space under the header,
-   with the footer line at the bottom. */
-[data-page="contact"] main,
-[data-page="contact"] .contact,
-[data-page="contact"] .contact > .wrap {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-[data-page="contact"] .contact-links {
-  margin-bottom: clamp(72px, 9vw, 120px);
-}
-
-[data-page="contact"] .footer-line {
-  margin-top: auto;
-}
-
 /* ==========================================================================
    Project panel
    ========================================================================== */
@@ -1669,48 +1998,28 @@ details[open] .run-toggle::after {
 }
 
 /* ==========================================================================
-   Page-to-page navigation
-   The header holds still while the page under it crossfades with a small
-   rise. Browsers without cross-document view transitions just navigate.
-   ========================================================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-    types: page;
-  }
-
-  .site-header {
-    view-transition-name: site-header;
-  }
-}
-
-:root:active-view-transition-type(page)::view-transition-old(root) {
-  animation: 120ms ease-in both page-out;
-}
-
-:root:active-view-transition-type(page)::view-transition-new(root) {
-  animation: 260ms var(--ease-out) both page-in;
-}
-
-@keyframes page-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-
-/* ==========================================================================
    Reduced motion
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
+  /* One still name, centred and sized to fit the width */
+  .ticker {
+    text-align: center;
+    font-size: min(clamp(3.5rem, 9.6vw, 9.375rem), calc((100vw - 2 * var(--gutter)) / 5.5));
+  }
+
+  .ticker-track > span {
+    padding-right: 0;
+  }
+
+  .ticker-track > span + span {
+    display: none;
+  }
+
+  .ticker-pause {
+    display: none;
+  }
+
   html {
     scroll-behavior: auto;
   }
