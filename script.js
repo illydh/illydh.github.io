@@ -3,37 +3,6 @@ import { mountPipeline } from "./pipeline.js";
 const root = document.documentElement;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
-/* Theme ------------------------------------------------------------------ */
-// Dark is the default (see the inline script in <head>); the toggle stores
-// the visitor's choice.
-
-const themeButtons = document.querySelectorAll("[data-theme-toggle]");
-const themeMeta = document.querySelector('meta[name="theme-color"]');
-
-function syncThemeUI() {
-  const dark = root.dataset.theme !== "light";
-  themeButtons.forEach((b) => b.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme"));
-  themeMeta?.setAttribute("content", getComputedStyle(root).getPropertyValue("--bg").trim());
-}
-
-function setTheme(theme) {
-  const apply = () => {
-    root.dataset.theme = theme;
-    syncThemeUI();
-    document.dispatchEvent(new CustomEvent("themechange"));
-  };
-  try {
-    localStorage.setItem("theme", theme);
-  } catch {}
-  if (document.startViewTransition && !reduceMotion.matches) document.startViewTransition(apply);
-  else apply();
-}
-
-themeButtons.forEach((b) =>
-  b.addEventListener("click", () => setTheme(root.dataset.theme === "light" ? "dark" : "light"))
-);
-syncThemeUI();
-
 /* Header and menu -------------------------------------------------------- */
 
 const header = document.querySelector(".site-header");
@@ -86,6 +55,68 @@ const sectionObserver = new IntersectionObserver(
 navLinks.forEach((_, id) => {
   const el = document.getElementById(id);
   if (el) sectionObserver.observe(el);
+});
+
+/* Scroll-in -------------------------------------------------------------- */
+// Each block below the cover rises into place when it comes on screen, and
+// again every time it returns after leaving the screen entirely. The reset
+// happens while it's off screen, so nothing visibly disappears. Blocks on
+// screen at load are left as they are. The cover replays its own entrance
+// the same way (see .cover[data-away] in style.css).
+
+const revealBlocks = document.querySelectorAll(
+  [
+    ".hero-text > *", ".hero .pipeline", ".hero .status",
+    ".section .sidehead > *", ".section .prose > *",
+    ".runs-head", ".run",
+    ".section-head", ".result-head", ".result-rows > li", ".stage",
+    ".contact .wrap > *",
+  ].join(", ")
+);
+const motionPaused = () => root.hasAttribute("data-motion-paused");
+
+// Fully off screen: get ready to play again.
+const leaveObserver = new IntersectionObserver((entries) => {
+  for (const { target, isIntersecting } of entries) {
+    if (isIntersecting) continue;
+    if (target === cover) cover.setAttribute("data-away", "");
+    else target.dataset.reveal = "out";
+  }
+});
+
+// Back on screen (a tenth of it in view below the header): play. Blocks that
+// arrive together follow each other, with the gaps shrinking down the list.
+const enterObserver = new IntersectionObserver(
+  (entries) => {
+    const arriving = entries
+      .filter(({ target, intersectionRatio }) =>
+        intersectionRatio >= 0.1 && (target === cover ? cover.hasAttribute("data-away") : target.dataset.reveal === "out")
+      )
+      .map((e) => e.target)
+      .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+    arriving.forEach((el, i) => {
+      if (el === cover) {
+        // While the page's motion is paused the cover just stays still.
+        if (!motionPaused()) cover.removeAttribute("data-away");
+        return;
+      }
+      el.style.setProperty("--reveal-delay", `${Math.round(300 * (1 - 0.78 ** i))}ms`);
+      el.dataset.reveal = motionPaused() ? "done" : "in";
+    });
+  },
+  { rootMargin: "-64px 0px 0px 0px", threshold: 0.1 }
+);
+
+const settle = (e) => {
+  if (e.animationName === "rise" && e.target.dataset?.reveal === "in") e.target.dataset.reveal = "done";
+};
+document.addEventListener("animationend", settle);
+document.addEventListener("animationcancel", settle);
+
+[cover, ...revealBlocks].forEach((el) => {
+  if (!el) return;
+  leaveObserver.observe(el);
+  enterObserver.observe(el);
 });
 
 /* Hero pipeline ---------------------------------------------------------- */
@@ -271,17 +302,24 @@ if (panel) {
 }
 
 /* Contact: copy the address ---------------------------------------------- */
+// The address is a plain mailto: link; the button beside it copies it. The
+// button only appears where the browser allows copying.
 
-const email = document.querySelector(".email[data-copy]");
+const copyButton = document.querySelector(".copy-email");
 const toast = document.querySelector(".contact .toast");
 let toastTimer = 0;
 
-email?.addEventListener("click", async (e) => {
-  if (!navigator.clipboard?.writeText) return; // fall back to mailto:
-  e.preventDefault();
-  try {
-    await navigator.clipboard.writeText(email.dataset.copy);
-    toast.textContent = "Copied";
+if (copyButton && navigator.clipboard?.writeText) {
+  copyButton.hidden = false;
+  copyButton.addEventListener("click", async () => {
+    let message = "Copied";
+    try {
+      await navigator.clipboard.writeText(copyButton.dataset.copy);
+    } catch {
+      message = "Couldn't copy";
+    }
+    toast.textContent = message;
+    toast.toggleAttribute("data-error", message !== "Copied");
     requestAnimationFrame(() => toast.classList.add("is-on"));
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
@@ -290,10 +328,8 @@ email?.addEventListener("click", async (e) => {
         if (!toast.classList.contains("is-on")) toast.textContent = "";
       }, 300);
     }, 1800);
-  } catch {
-    location.href = email.href;
-  }
-});
+  });
+}
 
 /* Cover: pause the moving name -------------------------------------------- */
 

@@ -1,11 +1,9 @@
 /* ==========================================================================
    Tokens
-   Dark is the default theme. The contact band always takes the opposite
-   theme, so each token block also targets it.
+   The site has one theme, dark.
    ========================================================================== */
 
-:root,
-[data-theme="light"] .contact {
+:root {
   --bg: #232323;
   --surface: #2c2c2c;
   --panel: #262626;
@@ -28,31 +26,6 @@
   --glyph: #8a8a8a;
   --grid-dot: rgb(255 255 255 / 0.075);
   color-scheme: dark;
-}
-
-[data-theme="light"],
-[data-theme="dark"] .contact {
-  --bg: #ffffff;
-  --surface: #f3f3f3;
-  --panel: #ffffff;
-  --ink: #232323;
-  --ink-2: #3a3a3a;
-  --muted: #686868;
-  --line: #e4e4e4;
-  --outline: #d4d4d4;
-  --accent: #a1ffcb;
-  --accent-ink: #232323;
-  --lit: #127a48;
-  --action: #232323;
-  --action-hover: #000000;
-  --action-ink: #ffffff;
-  --node: #ffffff;
-  --node-line: #d4d4d4;
-  --edge: #c4c4c4;
-  --record: #5c5c5c;
-  --glyph: #8a8a8a;
-  --grid-dot: rgb(0 0 0 / 0.08);
-  color-scheme: light;
 }
 
 :root {
@@ -288,8 +261,7 @@ h2 {
 
 /* Links outside running text get a 44px tap height */
 .profiles .text-link,
-.contact-links .text-link,
-.footer-line .text-link,
+.contact-list .text-link,
 .sidehead .text-link {
   display: inline-flex;
   align-items: center;
@@ -435,25 +407,20 @@ h2 {
   }
 }
 
+/* The links sit in the middle of the page; the right-hand column holds the
+   now-playing pill (and, on phones, the menu button). */
 .nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 32px;
   height: var(--header-h);
 }
 
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font: 500 1.0625rem/1 var(--font-text);
-  text-decoration: none;
-}
-
 .nav-links {
+  grid-column: 2;
   display: flex;
-  gap: 32px;
-  margin-left: auto;
+  gap: 40px;
   font-size: 0.9375rem;
 }
 
@@ -481,14 +448,11 @@ h2 {
 }
 
 .nav-actions {
+  grid-column: 3;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-[data-theme="dark"] .icon-moon,
-[data-theme="light"] .icon-sun {
-  display: none;
 }
 
 .menu-btn {
@@ -512,10 +476,6 @@ h2 {
 
   .menu-btn {
     display: inline-flex;
-  }
-
-  .nav-actions {
-    margin-left: auto;
   }
 
   /* The header's backdrop-filter makes it the containing block, so the menu
@@ -564,7 +524,7 @@ h2 {
    Cover
    The About photo across the full width with the name running over it,
    then the song, centred. The header stays hidden here until the page
-   scrolls. The name is white in both themes because it sits on the photo.
+   scrolls. The name is white because it sits on the photo.
    ========================================================================== */
 
 .cover {
@@ -939,8 +899,9 @@ h2 {
 }
 
 /* On load: the photo settles while the name fades in, then the song
-   follows. The name then drifts slowly sideways in a loop. Nothing else
-   moves because the page scrolled. */
+   follows. The name then drifts slowly sideways in a loop. The same
+   entrance plays again whenever the cover comes back on screen after
+   leaving it (script.js sets data-away while it's off screen). */
 @media (prefers-reduced-motion: no-preference) {
   .cover-photo img {
     animation: settle 1400ms var(--ease-out) backwards;
@@ -958,6 +919,23 @@ h2 {
   .cover-song {
     animation: rise 640ms var(--ease-out) backwards;
     animation-delay: 420ms;
+  }
+
+  .cover[data-away] :is(.cover-photo img, .ticker, .cover-song) {
+    animation: none;
+  }
+
+  /* Everything below the cover rises into place as it comes on screen, and
+     again each time it comes back after leaving the screen entirely.
+     script.js marks each block: "out" while it's off screen (so the reset
+     is never seen), "in" while it plays, "done" after. */
+  [data-reveal="out"] {
+    opacity: 0;
+  }
+
+  html:not([data-motion-paused]) [data-reveal="in"] {
+    animation: rise 560ms var(--ease-out) backwards;
+    animation-delay: var(--reveal-delay, 0ms);
   }
 
   .now-playing[data-playing] .eq i {
@@ -1668,42 +1646,123 @@ details[open] .run-toggle::after {
 }
 
 /* ==========================================================================
-   Contact (inverse band) and footer
+   Contact and footer
    ========================================================================== */
 
+/* One footer: a slightly lighter band holding "Let's connect", the
+   profile icons and the copyright on the left, and the email, résumé and
+   back-to-top against the right-hand edge, ending level with the
+   copyright. On phones they stack, with the copyright last. */
 .contact {
-  padding-block: clamp(80px, 9vw, 112px) 32px;
-  background: var(--bg);
-  color: var(--ink);
+  padding-block: clamp(40px, 5vw, 64px);
+  background: var(--surface);
 }
 
-.contact .label {
-  font-weight: 400;
+.contact > .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "lead list"
+    "fine list";
+  gap: 8px 40px;
+}
+
+.contact-lead {
+  grid-area: lead;
+}
+
+.contact-list {
+  grid-area: list;
+  align-self: end;
+}
+
+@media (max-width: 600px) {
+  .contact > .wrap {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "lead"
+      "list"
+      "fine";
+    row-gap: 24px;
+  }
+
+  .contact .fine {
+    min-height: 0;
+    margin-top: -12px;
+  }
+}
+
+.contact-icons {
+  display: flex;
+  gap: 4px;
+  margin: 16px 0 0 -11px;
+}
+
+.icon-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--ink-2);
+  transition: color 160ms ease;
+}
+
+.contact-list {
+  font-size: 1.0625rem;
+}
+
+/* As tall as a link row, so it sits level with "Back to top" */
+.contact .fine {
+  grid-area: fine;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font: 400 0.75rem/1.5 var(--font-mono);
+  color: var(--muted);
 }
 
 .email-row {
+  position: relative;
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 16px 24px;
-  margin-top: 24px;
+  align-items: center;
+  gap: 0 4px;
 }
 
-.email {
-  font: 400 clamp(1.75rem, 6.1vw, 5.5rem) / 1.05 var(--font-display);
-  letter-spacing: -0.025em;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.12em;
-  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
-  overflow-wrap: anywhere;
-  padding-block: 8px;
-  transition: text-decoration-color 200ms ease;
+/* Pops up above the copy button, so the column never shifts */
+.email-row .toast {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 2px);
+  white-space: nowrap;
+}
+
+/* The 44px target reaches into the margin so the icon itself lines up
+   with the right-hand edge. */
+.copy-email {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.copy-email[hidden] {
+  display: none;
 }
 
 @media (hover: hover) {
-  .email:hover {
-    text-decoration-color: currentColor;
+  .icon-link:hover,
+  .copy-email:hover {
+    color: var(--lit);
   }
 }
 
@@ -1733,49 +1792,16 @@ details[open] .run-toggle::after {
   content: "";
   width: 16px;
   height: 16px;
-  color: var(--accent);
+  color: var(--action-ink);
 }
 
-/* On a dark band the toast itself is mint, so the check takes the ink colour */
-[data-theme="light"] .contact .toast::before {
-  color: var(--action-ink);
+.toast[data-error]::before {
+  display: none;
 }
 
 .toast.is-on {
   opacity: 1;
   transform: none;
-}
-
-.contact-line {
-  max-width: 40rem;
-  margin-top: 24px;
-  font-size: 1.1875rem;
-  color: var(--muted);
-}
-
-.contact-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 32px;
-  margin-top: 20px;
-  font-size: 1.0625rem;
-}
-
-.footer-line {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px 24px;
-  align-items: center;
-  margin-top: clamp(72px, 9vw, 120px);
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  font: 400 0.75rem/1.5 var(--font-mono);
-  color: var(--muted);
-}
-
-.footer-line .text-link {
-  color: var(--ink);
 }
 
 /* ==========================================================================
