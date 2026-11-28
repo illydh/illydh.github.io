@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <script>
       // The site is one page. Old section pages (/about.html, /experience,
@@ -15,16 +15,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#232323" />
+    <meta name="color-scheme" content="dark" />
     <title>Page not found · Illy Hoang</title>
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png" />
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
-    <script>
-      (function () {
-        try {
-          if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light";
-        } catch (e) {}
-      })();
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -35,12 +29,6 @@
   </head>
 
   <body>
-    <header class="site-header">
-      <nav class="nav wrap" aria-label="Main">
-        <a class="wordmark" href="/">Illy Hoang</a>
-      </nav>
-    </header>
-
     <main id="main">
       <section class="section not-found" aria-labelledby="not-found-title">
         <div class="wrap">

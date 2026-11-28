@@ -5,8 +5,8 @@
 // or tapping a node lights its upstream and downstream lineage and shows a
 // rows/s readout; with no pointer the selection cycles through nodes.
 //
-// Colours come from CSS custom properties on the canvas, so the graph follows
-// the page theme. Motion stops when the graph is off screen, when the tab is
+// Colours come from CSS custom properties on the canvas, so the graph uses
+// the page's palette. Motion stops when the graph is off screen, when the tab is
 // hidden, when the visitor pauses it, and under prefers-reduced-motion.
 
 const LAYOUTS = {
@@ -106,7 +106,7 @@ export function mountPipeline(canvas, { pauseButton } = {}) {
   let L = LAYOUTS.wide, scale = 1, ox = 0, oy = 0, k = 1, readoutY = 0;
   let nodes = new Map();
   let edges = [];
-  let colors = readColors();
+  const colors = readColors();
 
   let selected = CYCLE[0];
   let cycleIndex = 0;
@@ -478,10 +478,6 @@ export function mountPipeline(canvas, { pauseButton } = {}) {
 
   document.addEventListener("visibilitychange", start);
   reduce.addEventListener("change", start);
-  document.addEventListener("themechange", () => {
-    colors = readColors();
-    draw();
-  });
 
   if (pauseButton) {
     pauseButton.addEventListener("click", () => {
