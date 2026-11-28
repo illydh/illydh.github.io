@@ -1,54 +1,81 @@
-# Hello, I'm Illy Hoang! 👋
+# Illy Hoang · portfolio
 
-Welcome to the source code repository for my personal portfolio website, where I showcase my experience, skills, and latest projects.
+The source for [illydh.github.io](https://illydh.github.io/), my portfolio as an aspiring data engineer.
 
-🔗 **Live Website:** [illydh.github.io](https://illydh.github.io/)
+## About me
 
----
+I'm a computer science master's student at USC, working toward data engineering.
 
-## About Me
+**Now**
 
-I am a first-year Master's in Computer Science student at the University of Southern California (USC), specializing in AI. I am deeply passionate about machine learning, large language models, and leveraging technology to address real-world challenges.
+- Data Platform SWE Intern, The Aerospace Corporation
+- M.S. Computer Science, University of Southern California
+- Graduate Research Assistant, FORTIS Lab
+- Computer Vision Lead, USC Advanced Robotic Combat
 
-**Current Roles:**
+**Before**
 
-- Data Platform SWE Intern @ The Aerospace Corporation
-- Master's student studying Computer Science @ USC
-- Graduate Research Assistant @ FORTIS Lab
-- Computer Vision Lead @ USC ARC
+- Software Engineer Intern, Savant Systems
+- Undergraduate Teaching Assistant, UConn School of Computing
+- InStep Intern (AI research), Infosys
+- Web Developer, UConn University Communications
+- Database Intern, Easy Event Planning
 
-**Past Experience:**
+**Skills**, grouped the way the site groups them:
 
-- SWE Intern @ Savant Systems
-- Undergrad TA @ UConn SoC
-- InStep Intern @ Infosys
-- Web Developer @ UConn UComm
+| Stage | Tools |
+|---|---|
+| Ingest | Python, Node.js, Playwright |
+| Store | PostgreSQL, MongoDB, AWS |
+| Transform | SQL, pandas, Polars, NumPy |
+| Orchestrate | Docker, Git, Jenkins |
+| Serve | FastAPI, Flask, Tableau |
 
-## Technical Skills
+Languages: Python, SQL, Java, C++, TypeScript, Bash.
 
-- **Languages:** Python, Java, C/C++, JavaScript, TypeScript, HTML/CSS, Bash, PHP
-- **AI/Data Science:** PyTorch, TensorFlow, Keras, Scikit-Learn, Pandas, NumPy, Matplotlib, Polars
-- **Web & Frameworks:** React, NodeJS, ExpressJS, Django, Flask, VueJS, Ruby on Rails
-- **Tools:** Git, MongoDB, Jenkins, Tableau, Docker
+**Projects**
 
-## Featured Projects
+- [Tiến Lên AI](https://github.com/illydh/tien-len-ai): AI players for a Vietnamese card game ([demo](https://tien-len-ai.vercel.app/))
+- [GhostFormer](https://github.com/illydh/2025-nfl-bdb): predicting a hidden NFL player's motion
+- [AQ-10 screening model](https://github.com/illydh/aq10-analysis): autism screening from ten questionnaire answers
+- [FashionForward](https://github.com/CSE-SDP-Group-11): outfit compatibility and recommendations
+- [Attention in NMT](https://github.com/illydh/nmt-model): how much attention matters in translation
+- [Calories burned](https://github.com/illydh/calories-burnt-predictor): estimating calories from a workout's vitals
 
-Here are some of the exciting projects I've worked on recently (also featured on my portfolio):
+**Contact:** [illyd.hoang@gmail.com](mailto:illyd.hoang@gmail.com) · [LinkedIn](https://www.linkedin.com/in/illydh/) · [GitHub](https://github.com/illydh)
 
-- **[Tiến Lên AI - Traditional VN Card Game Bot](https://github.com/illydh/tien-len-ai)** ([Demo](https://tien-len-ai.vercel.app/))
-- **Predicting Motion of Masked Player with Transformers**
-- **Analyzing Autistic Behavioral Persistence with Transformers**
-- **Evaluating Attention in Neural Machine Translation**
-- **End-to-End Exercise Caloric Expenditure Pipeline**
+## The site
 
-## Get In Touch
+One page, plain HTML, CSS and JavaScript modules, with no framework and no build step. GitHub Pages serves the files as they are.
 
-I am actively seeking new opportunities to collaborate on innovative projects and research.
+From the top:
 
-- **LinkedIn:** [linkedin.com/in/illydh](https://www.linkedin.com/in/illydh/)
-- **Email:** [illyd.hoang@gmail.com](mailto:illyd.hoang@gmail.com)
-- **GitHub:** [github.com/illydh](https://github.com/illydh)
+1. **Cover**: my photo across the full width with my name running over it, and a song to play while you scroll (Spotify). The header stays hidden until the page scrolls.
+2. **Introduction**: a short intro, résumé and email buttons, and a live pipeline graph you can hover.
+3. **About**, **Experience**, **Projects** (each opens a detail panel; `#project-<slug>` links straight to one) and **Skills**.
+4. **Contact**: the footer band; clicking the address copies it.
 
----
+Dark is the default theme, and the toggle remembers a visitor's choice. `404.html` is shown for unknown addresses and sends old links such as `/about.html` to the matching section.
 
-_Feel free to explore the code! This site was built using standard HTML, CSS, and Vanilla JavaScript, ensuring a fast, responsive, and accessible experience across all devices._
+```
+index.html     the page
+style.css      all styles; colours are tokens at the top
+script.js      theme, menu, cover header, project preview and panel, copy-the-email
+pipeline.js    the hero pipeline graph (canvas)
+404.html       not-found page and old-link redirects
+assets/        cover photo, portrait, icons, résumé, project images and reports
+```
+
+## Working on it
+
+Preview with any static server from the repo root (module scripts need one):
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000.
+
+**Cover.** The photo is `assets/portrait.webp` (with `portrait-640.webp` for small screens); `object-position` on `.cover-photo img` moves the subject. The song is the `.song` link in the cover section of `index.html`: to change it, update its `href`, `data-spotify-uri` (`spotify:track:<id>` from the track's Share link), title and artist, and the title in the header's `.now-playing` pill and in `script.js` (`SONG`). Visitors who aren't logged in to Spotify hear a 30-second preview.
+
+**Projects.** Each project's write-up is a `<template id="project-<slug>">` near the end of `index.html`. Its images go in `assets/section-projects/preview/` and `assets/section-projects/thumb/` as WebP.
